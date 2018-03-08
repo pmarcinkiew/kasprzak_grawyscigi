@@ -31,6 +31,12 @@ public class GdxHello extends ApplicationAdapter {
 	public void render () {
 		// Na razie symulejemy ruch gracza korzystając z funkcji trygonomoetrycznych i czasu
 
+
+		if (Gdx.input.isTouched()) {
+			Gdx.app.log("TOUCH", "touch x: " + Gdx.input.getX() + "y: " + Gdx.input.getY());
+
+		}
+
 		// Zmienna time oznacza czas gry - getDeltaTime zwraca różnicę czasu
 		time += Gdx.graphics.getDeltaTime();
 		float srotdeg = time * 180 / 3.14f; // Czas traktujemy jako radiany a obroty wymagają stopni
