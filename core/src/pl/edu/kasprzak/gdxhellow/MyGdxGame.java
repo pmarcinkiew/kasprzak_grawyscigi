@@ -5,8 +5,10 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.MathUtils;
@@ -22,18 +24,20 @@ public class MyGdxGame implements Screen, InputProcessor{
     private Vector2 auto_position;
     private Music gameplay_music;
 
-    private final float max_speed = 450;
+    private final float max_speed = 500;
     private final float turn_speed = 10;
     private final float speed_of_accel = 3;
     private final float speed_of_break = 3;
     private float accel_speed = 0;
     private float default_accel_y;
 	private float auto_rotation;
+    private boolean show_help = true;
 
 	public MyGdxGame (final GameCore game) {
         Gdx.input.setCatchBackKey(true);
         this.game = game;
         Gdx.input.setInputProcessor(this);
+        game.font.getData().setScale(2f);
         gameplay_music = Gdx.audio.newMusic(Gdx.files.internal("Gameplay.mp3"));
         gameplay_music.setVolume(1f);
         gameplay_music.setLooping(true);
@@ -44,7 +48,7 @@ public class MyGdxGame implements Screen, InputProcessor{
 		auto = new Sprite(new Texture("Audi.png"));
         auto.setOrigin(auto.getWidth()/2, auto.getHeight()/2);
         //set auto
-		auto_position = new Vector2(50,50);
+		auto_position = new Vector2(150,695);
 		auto_rotation = 0;
         auto.setRotation(auto_rotation);
         auto.setPosition(0,0);
@@ -88,7 +92,10 @@ public class MyGdxGame implements Screen, InputProcessor{
             auto.setPosition(auto_position.x,auto_position.y);
             auto.draw(game.batch);
         }
-
+        if(show_help){
+            game.layout.setText(game.font, "Dotknij aby jechac, obracaj telefonem aby skrecac");
+            game.font.draw(game.batch, game.layout, auto.getX() - game.layout.width/2 + auto.getWidth()/2, auto.getY());
+        }
         game.batch.end(); //koniec rysowania
     }
 
@@ -122,26 +129,38 @@ public class MyGdxGame implements Screen, InputProcessor{
         float x = accel_speed * Gdx.graphics.getDeltaTime() * MathUtils.cos((float)((Math.PI / 180) * ( auto_rotation + 90 )));
         float y = accel_speed * Gdx.graphics.getDeltaTime() * MathUtils.sin((float)((Math.PI / 180) * ( auto_rotation + 90 )));
 
-        if((auto_position.x + x)>=0) {
-            auto_position.x += x;
-            camera.translate(x,0);
-        }else {
+        if((auto_position.x + x) < 0 ) {
             auto_position.x = 0;
             camera.position.set(auto_position.x + auto.getOriginX(), auto_position.y + auto.getOriginY(),0);
             if (accel_speed>200){
                 accel_speed = 200;
             }
+        }else if((auto_position.x + x) > mapa.getWidth() - auto.getHeight()){
+            auto_position.x = mapa.getWidth() - auto.getHeight();
+            camera.position.set(auto_position.x + auto.getOriginX(), auto_position.y + auto.getOriginY(),0);
+            if (accel_speed>200){
+                accel_speed = 200;
+            }
+        }else {
+            auto_position.x += x;
+            camera.translate(x,0);
         }
 
-        if((auto_position.y + y)>=0) {
-            auto_position.y += y;
-            camera.translate(0,y);
-        }else {
+        if((auto_position.y + y) < 0) {
             auto_position.y = 0;
             camera.position.set(auto_position.x + auto.getOriginX(), auto_position.y + auto.getOriginY(),0);
             if (accel_speed>200){
                 accel_speed = 200;
             }
+        }else if((auto_position.y + y) > mapa.getHeight() - auto.getHeight()){
+            auto_position.y = mapa.getHeight() - auto.getHeight();
+            camera.position.set(auto_position.x + auto.getOriginX(), auto_position.y + auto.getOriginY(),0);
+            if (accel_speed>200){
+                accel_speed = 200;
+            }
+        }else {
+            auto_position.y += y;
+            camera.translate(0,y);
         }
         Gdx.app.log("Accel speed", ""+accel_speed);
     }
@@ -190,6 +209,9 @@ public class MyGdxGame implements Screen, InputProcessor{
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        if(show_help){
+            show_help = !show_help;
+        }
         return false;
     }
 
