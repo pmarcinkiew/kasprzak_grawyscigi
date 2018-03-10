@@ -1,11 +1,12 @@
 package pl.edu.kasprzak.gdxhellow;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
-public class MainMenu implements Screen {
+public class MainMenu implements Screen, InputProcessor {
 
     final GameCore game;
     OrthographicCamera cam;
@@ -14,6 +15,7 @@ public class MainMenu implements Screen {
     boolean is_going_up = true;
 
     public MainMenu(final GameCore game) {
+        Gdx.input.setInputProcessor(this);
         this.game = game;
         cam = new OrthographicCamera(800,480);
         cam.position.set(0,0,0);
@@ -27,10 +29,6 @@ public class MainMenu implements Screen {
 
     @Override
     public void render(float delta) {
-        if (Gdx.input.isTouched()){
-            game.setScreen(new MyGdxGame(game));
-            dispose();
-        }
         Gdx.gl.glClearColor(57/255.0f,174/255.0f,194/255.0f,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         cam.update();
@@ -79,4 +77,47 @@ public class MainMenu implements Screen {
         }
     }
 
+    //input handle
+
+    @Override
+    public boolean keyDown(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped(char character) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        this.dispose();
+        game.setScreen(new MyGdxGame(game));
+        return false;
+    }
+
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        return false;
+    }
+
+    @Override
+    public boolean mouseMoved(int screenX, int screenY) {
+        return false;
+    }
+
+    @Override
+    public boolean scrolled(int amount) {
+        return false;
+    }
 }
