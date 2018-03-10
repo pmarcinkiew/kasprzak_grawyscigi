@@ -3,20 +3,26 @@ package pl.edu.kasprzak.gdxhellow;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
 public class MainMenu implements Screen, InputProcessor {
 
     final GameCore game;
-    OrthographicCamera cam;
-    float additional_x = 0;
-    float speed_of_jump = 150;
-    boolean is_going_up = true;
+    private Music menu_music;
+    private OrthographicCamera cam;
+    private float additional_x = 0;
+    private float speed_of_jump = 150;
+    private boolean is_going_up = true;
 
     public MainMenu(final GameCore game) {
         Gdx.input.setInputProcessor(this);
         this.game = game;
+        menu_music = Gdx.audio.newMusic(Gdx.files.internal("Menu.mp3"));
+        menu_music.setVolume(1f);
+        menu_music.setLooping(true);
+        menu_music.play();
         cam = new OrthographicCamera(800,480);
         cam.position.set(0,0,0);
         game.font.getData().setScale(2);
@@ -64,7 +70,7 @@ public class MainMenu implements Screen, InputProcessor {
 
     @Override
     public void dispose() {
-
+        menu_music.dispose();
     }
 
     private void jumping_text(){

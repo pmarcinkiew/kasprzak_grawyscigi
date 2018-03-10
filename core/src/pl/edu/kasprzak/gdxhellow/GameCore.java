@@ -12,7 +12,6 @@ public class GameCore extends Game {
 
     SpriteBatch batch;
     BitmapFont font;
-    Music back_music;
     GlyphLayout layout;
 
     @Override
@@ -20,11 +19,7 @@ public class GameCore extends Game {
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
         batch = new SpriteBatch();
         layout = new GlyphLayout();
-        back_music = Gdx.audio.newMusic(Gdx.files.internal("music.mp3"));
         font = new BitmapFont();
-        back_music.setVolume(1f);
-        back_music.setLooping(true);
-        back_music.play();
         this.setScreen(new MainMenu(this));
     }
 
@@ -37,8 +32,5 @@ public class GameCore extends Game {
     public void dispose() {
         batch.dispose();
         font.dispose();
-        back_music.dispose();
     }
-
-
 }

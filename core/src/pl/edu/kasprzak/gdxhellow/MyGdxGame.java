@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -19,6 +20,7 @@ public class MyGdxGame implements Screen, InputProcessor{
     private Texture mapa;
     private Sprite auto;
     private Vector2 auto_position;
+    private Music gameplay_music;
 
     private final float max_speed = 450;
     private final float turn_speed = 10;
@@ -32,6 +34,10 @@ public class MyGdxGame implements Screen, InputProcessor{
         Gdx.input.setCatchBackKey(true);
         this.game = game;
         Gdx.input.setInputProcessor(this);
+        gameplay_music = Gdx.audio.newMusic(Gdx.files.internal("Gameplay.mp3"));
+        gameplay_music.setVolume(1f);
+        gameplay_music.setLooping(true);
+        gameplay_music.play();
 		camera = new OrthographicCamera(800,480);
         camera.setToOrtho(false, 800, 480);
 		mapa = new Texture("mapa.png");
@@ -108,6 +114,7 @@ public class MyGdxGame implements Screen, InputProcessor{
 
     @Override
 	public void dispose () {
+        gameplay_music.dispose();
 		mapa.dispose();
 	}
 
