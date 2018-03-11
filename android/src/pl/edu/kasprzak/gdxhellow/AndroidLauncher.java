@@ -4,13 +4,15 @@ import android.os.Bundle;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import pl.edu.kasprzak.gdxhellow.GdxHello;
 
 public class AndroidLauncher extends AndroidApplication {
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-		initialize(new GdxHello(), config);
+		config.useGyroscope = false;
+		config.useAccelerometer = true;
+		config.useCompass = false;
+		initialize(new GameCore(), config);
 	}
 }
