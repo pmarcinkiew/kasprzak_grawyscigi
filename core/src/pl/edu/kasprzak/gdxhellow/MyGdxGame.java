@@ -54,7 +54,6 @@ public class MyGdxGame implements Screen, InputProcessor{
         auto.setPosition(0,0);
         camera.position.set(auto.getOriginX() + auto_position.x,auto.getOriginY()+auto_position.y,0);
         camera.rotate(0);
-        default_accel_y = Gdx.input.getAccelerometerY();
 
 	}
 
@@ -211,6 +210,7 @@ public class MyGdxGame implements Screen, InputProcessor{
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         if(show_help){
             show_help = !show_help;
+            default_accel_y = Gdx.input.getAccelerometerY();
         }
         return false;
     }
