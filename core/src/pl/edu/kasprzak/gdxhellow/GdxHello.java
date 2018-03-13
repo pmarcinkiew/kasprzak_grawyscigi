@@ -18,9 +18,9 @@ public class GdxHello extends ApplicationAdapter {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-        mapCamera = new OrthographicCamera();
+		mapCamera = new OrthographicCamera();
 		carCamera = new OrthographicCamera();
-        mapa = new Texture("mapa.png");
+		mapa = new Texture("mapa.png");
 		grid = new Texture("libgdxgridtest.png");
 		car = new Texture("Audi.png");
 	}
@@ -32,16 +32,22 @@ public class GdxHello extends ApplicationAdapter {
 		// Na razie symulejemy ruch gracza korzystając z funkcji trygonomoetrycznych i czasu
 
 
-		if (Gdx.input.isTouched()) {
-			Gdx.app.log("TOUCH", "touch x: " + Gdx.input.getX() + "y: " + Gdx.input.getY());
-
+		// Skanujemy dotyk dla maksymalnie 10 palców
+		for (int i = 0; i < 10; ++i) {
+			if (Gdx.input.isTouched(i)) {
+				Gdx.app.log("TOUCH", "touch ID: " + i + " x: " + Gdx.input.getX(i) +
+							" y: " + Gdx.input.getY(i));
+			}
 		}
 
 		// Zmienna time oznacza czas gry - getDeltaTime zwraca różnicę czasu
 		time += Gdx.graphics.getDeltaTime();
+		float radius = 200;
+		float centerX = 800;
+		float centerY = 800;
 		float srotdeg = time * 180 / 3.14f; // Czas traktujemy jako radiany a obroty wymagają stopni
-		float x = (float)Math.cos(time) * 200 + 800;
-		float y = (float)Math.sin(time) * 200 + 800;
+		float x = (float)Math.cos(time) * radius + centerX;
+		float y = (float)Math.sin(time) * radius + centerY;
 
 		// Czyścimy ekran - 0, 0, 0 da czarny, ale na razie jest zielony żeby grid było widać
 		Gdx.gl.glClearColor(0, 1, 0, 1);
@@ -58,6 +64,7 @@ public class GdxHello extends ApplicationAdapter {
 		// Ustawienie podstawowych parametrów kamery dla samochodu
 		carCamera.setToOrtho(false, 800, 480); // Rozmiar wirtualnego ekranu
 		carCamera.translate(-400, -240);       // Przestawiamy na środek ekranu początek dla kamery
+		carCamera.translate(25, 25);           // Przestawiamy środek obrotu na środek samochodu
 		carCamera.rotate(srotdeg);             // Obracamy samochód zgodnie z kierunkiem jazdy
 		carCamera.update();
 
@@ -83,6 +90,6 @@ public class GdxHello extends ApplicationAdapter {
 	@Override
 	public void dispose () {
 		batch.dispose();
-        mapa.dispose();
-    }
+		mapa.dispose();
+	}
 }
