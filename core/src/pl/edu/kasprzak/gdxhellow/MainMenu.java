@@ -107,8 +107,7 @@ public class MainMenu implements Screen, InputProcessor {
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        this.dispose();
-        game.setScreen(new MyGdxGame(game));
+        game.setScreen(new MyGdxGame(game),this);
         return false;
     }
 

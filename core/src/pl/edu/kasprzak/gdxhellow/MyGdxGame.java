@@ -24,7 +24,9 @@ public class MyGdxGame implements Screen, InputProcessor{
     private Vector2 auto_position;
     private Music gameplay_music;
     private Pixmap pixmap;
+    Color color_on_position = new Color();
 
+    private short state = 0;
     private final float max_speed = 500;
     private final float turn_speed = 10;
     private final float speed_of_accel = 3;
@@ -33,6 +35,7 @@ public class MyGdxGame implements Screen, InputProcessor{
     private float default_accel_y;
 	private float auto_rotation;
     private boolean show_help = true;
+    private boolean lose = false;
 
 	public MyGdxGame (final GameCore game) {
         Gdx.input.setCatchBackKey(true);
@@ -55,8 +58,7 @@ public class MyGdxGame implements Screen, InputProcessor{
         auto.setPosition(0,0);
         camera.position.set(auto.getOriginX() + auto_position.x,auto.getOriginY()+auto_position.y,0);
         camera.rotate(0);
-        pixmap = new Pixmap(Gdx.files.internal("collisionMap.png"));
-        pixmap.getPixel((int)auto_position.x,(int)auto_position.y);
+        pixmap = new Pixmap(Gdx.files.internal("test.png"));
 	}
 
     @Override
@@ -74,7 +76,7 @@ public class MyGdxGame implements Screen, InputProcessor{
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.draw(mapa, 0, 0);
         { //auto draw and calculate
-            if(Gdx.input.isTouched()){
+            if(Gdx.input.isTouched() && !lose){
                 if (accel_speed<max_speed) {
                     accel_speed += speed_of_accel;
                 }
@@ -86,15 +88,22 @@ public class MyGdxGame implements Screen, InputProcessor{
             }
             if (accel_speed != 0) {
                 float accel_y = Gdx.input.getAccelerometerY();
-                auto_add_rotation((accel_y - default_accel_y) * Gdx.graphics.getDeltaTime() * turn_speed);
+                autoAddRotation((accel_y - default_accel_y) * Gdx.graphics.getDeltaTime() * turn_speed);
+                autoMoveForward();
+                checkState();
+                Gdx.app.log("State: ", ""+state);
+                if(state == 4) weHaveAWinner();
             }
-            auto_move_forward();
             auto.setRotation(auto_rotation);
             auto.setPosition(auto_position.x,auto_position.y);
             auto.draw(game.batch);
         }
         if(show_help){
             game.layout.setText(game.font, "Dotknij aby jechac, obracaj telefonem aby skrecac");
+            game.font.draw(game.batch, game.layout, auto.getX() - game.layout.width/2 + auto.getWidth()/2, auto.getY());
+        }
+        if(lose){
+            game.layout.setText(game.font, "Wypadles z mapy i musisz zaczac od poczatku...");
             game.font.draw(game.batch, game.layout, auto.getX() - game.layout.width/2 + auto.getWidth()/2, auto.getY());
         }
         game.batch.end(); //koniec rysowania
@@ -127,47 +136,29 @@ public class MyGdxGame implements Screen, InputProcessor{
         pixmap.dispose();
 	}
 
-    private void auto_move_forward(){
+    private void autoMoveForward(){
         float x = accel_speed * Gdx.graphics.getDeltaTime() * MathUtils.cos((float)((Math.PI / 180) * ( auto_rotation + 90 )));
         float y = accel_speed * Gdx.graphics.getDeltaTime() * MathUtils.sin((float)((Math.PI / 180) * ( auto_rotation + 90 )));
-
-        if((auto_position.x + x) < 0 ) {
-            auto_position.x = 0;
-            camera.position.set(auto_position.x + auto.getOriginX(), auto_position.y + auto.getOriginY(),0);
-            if (accel_speed>200){
-                accel_speed = 200;
-            }
-        }else if((auto_position.x + x) > mapa.getWidth() - auto.getHeight()){
-            auto_position.x = mapa.getWidth() - auto.getHeight();
-            camera.position.set(auto_position.x + auto.getOriginX(), auto_position.y + auto.getOriginY(),0);
-            if (accel_speed>200){
-                accel_speed = 200;
-            }
-        }else {
-            auto_position.x += x;
-            camera.translate(x,0);
+        auto_position.x += x;
+        auto_position.y += y;
+        Color.rgba8888ToColor(color_on_position,pixmap.getPixel((int)auto_position.x+(int)auto.getOriginX(),(int)auto_position.y+(int)auto.getOriginY()));
+        int blue = (int)(color_on_position.b * 255f);
+        if(blue == 255) {
+            auto_position.x = 150;
+            auto_position.y = 695;
+            auto_rotation = 0;
+            accel_speed = 0;
+            camera.position.set(auto_position.x,auto_position.y,0);
+            camera.up.set(0, 1, 0);
+            camera.direction.set(0, 0, -1);
+            lose = true;
+            state = 0;
+        }else{
+            camera.translate(x, y);
         }
-
-        if((auto_position.y + y) < 0) {
-            auto_position.y = 0;
-            camera.position.set(auto_position.x + auto.getOriginX(), auto_position.y + auto.getOriginY(),0);
-            if (accel_speed>200){
-                accel_speed = 200;
-            }
-        }else if((auto_position.y + y) > mapa.getHeight() - auto.getHeight()){
-            auto_position.y = mapa.getHeight() - auto.getHeight();
-            camera.position.set(auto_position.x + auto.getOriginX(), auto_position.y + auto.getOriginY(),0);
-            if (accel_speed>200){
-                accel_speed = 200;
-            }
-        }else {
-            auto_position.y += y;
-            camera.translate(0,y);
-        }
-        Gdx.app.log("Accel speed", ""+accel_speed);
     }
 
-    private void auto_add_rotation(float degrees){
+    private void autoAddRotation(float degrees){
         if(auto_rotation>359){
             auto_rotation = 0 + (auto_rotation - 360);
         }
@@ -178,13 +169,31 @@ public class MyGdxGame implements Screen, InputProcessor{
         camera.rotate(degrees);
     }
 
-    public void auto_move(float x, float y, float degrees){
+    private void checkState(){
+        if(state == 0){
+            if((int)(color_on_position.r * 255f) == 255) state++;
+        }else if(state == 1){
+            if((int)(color_on_position.r * 255f) == 0 && (int)(color_on_position.g * 255f) == 0 && (int)(color_on_position.b * 255f) == 0){state++;}
+            else if((int)(color_on_position.g * 255f) == 255) state--;
+        }else if(state == 2){
+            if((int)(color_on_position.g * 255f) == 255){state++;}
+            else if((int)(color_on_position.r * 255f) == 255) state--;
+        }else if(state == 3) {
+            if((int)(color_on_position.r * 255f) == 255){state++;}
+            else if((int)(color_on_position.r * 255f) == 0 && (int)(color_on_position.g * 255f) == 0 && (int)(color_on_position.b * 255f) == 0) state--;
+        }
+    }
+
+    private void weHaveAWinner(){
+        game.setScreen(new MainMenu(game),this);
+    }
+    /*public void autoMove(float x, float y, float degrees){
         auto_rotation = 0 - degrees;
         auto_position.x = x;
         auto_position.y = y;
         camera.position.set(auto_position.x + auto.getOriginX(),auto_position.y + auto.getOriginY(),0);
         camera.rotate(degrees);
-    }
+    }*/
 
 
     //input handle
@@ -192,8 +201,7 @@ public class MyGdxGame implements Screen, InputProcessor{
     public boolean keyDown(int keycode) {
         if(keycode == Input.Keys.BACK){
             Gdx.input.setCatchBackKey(false);
-            this.dispose();
-            game.setScreen(new MainMenu(game));
+            game.setScreen(new MainMenu(game),this);
             return true;
         }
         return false;
@@ -214,6 +222,9 @@ public class MyGdxGame implements Screen, InputProcessor{
         if(show_help){
             show_help = !show_help;
             default_accel_y = Gdx.input.getAccelerometerY();
+        }
+        if(lose){
+            lose = false;
         }
         return false;
     }
