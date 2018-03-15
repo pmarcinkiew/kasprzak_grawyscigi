@@ -23,6 +23,7 @@ public class MyGdxGame implements Screen, InputProcessor{
     private Sprite auto;
     private Vector2 auto_position;
     private Music gameplay_music;
+    private Pixmap pixmap;
 
     private final float max_speed = 500;
     private final float turn_speed = 10;
@@ -54,7 +55,8 @@ public class MyGdxGame implements Screen, InputProcessor{
         auto.setPosition(0,0);
         camera.position.set(auto.getOriginX() + auto_position.x,auto.getOriginY()+auto_position.y,0);
         camera.rotate(0);
-
+        pixmap = new Pixmap(Gdx.files.internal("collisionMap.png"));
+        pixmap.getPixel((int)auto_position.x,(int)auto_position.y);
 	}
 
     @Override
@@ -122,6 +124,7 @@ public class MyGdxGame implements Screen, InputProcessor{
 	public void dispose () {
         gameplay_music.dispose();
 		mapa.dispose();
+        pixmap.dispose();
 	}
 
     private void auto_move_forward(){
