@@ -26,6 +26,7 @@ public class MainMenu implements Screen, InputProcessor {
         cam = new OrthographicCamera(800,480);
         cam.position.set(0,0,0);
         game.font.getData().setScale(2);
+        game.timer = 0;
     }
 
     @Override

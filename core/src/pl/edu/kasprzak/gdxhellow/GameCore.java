@@ -13,6 +13,7 @@ public class GameCore extends Game {
     SpriteBatch batch;
     BitmapFont font;
     GlyphLayout layout;
+    float timer = 0;
 
     @Override
     public void create() {
