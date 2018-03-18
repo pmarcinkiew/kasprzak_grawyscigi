@@ -92,7 +92,7 @@ public class GdxHello extends ApplicationAdapter {
 		float radius = 200;
 		float centerX = 800;
 		float centerY = 800;
-		loat srotdeg = time * 180 / 3.14f; // Czas traktujemy jako radiany a obroty wymagają stopni
+		float srotdeg = time * 180 / 3.14f; // Czas traktujemy jako radiany a obroty wymagają stopni
 		float x = (float)Math.cos(time) * radius + centerX;
 		float y = (float)Math.sin(time) * radius + centerY;*/
 
